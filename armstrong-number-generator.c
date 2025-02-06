@@ -77,7 +77,7 @@ void search(int digit, int unused, uint128 pow, int sum_candidate_mod9, int sum_
 
     // Prune if even the maximum possible remaining sum can't reach minPow
     if (digit > 0) {
-        uint128 max_remaining = (uint128)unused * pows[digit - 1][N];
+        uint128 max_remaining = (uint128)unused * pows[digit][N];
         if (pow + max_remaining < minPow) {
             return;
         }
