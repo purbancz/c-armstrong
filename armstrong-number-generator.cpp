@@ -14,6 +14,7 @@ uint128 minPow, maxPow;
 int N;
 int digitsMultiSet[10];
 int testMultiSet[10];
+int mod9_pows[10];
 
 // Function to print __int128 as a decimal string
 void print_uint128(uint128 num) {
@@ -71,21 +72,37 @@ int check(uint128 candidate) {
     return frequenciesEqual(testMultiSet, digitsMultiSet);
 }
 
-// Recursive function to generate combinations and check Armstrong numbers
-void search(int digit, int unused, uint128 pow) {
+void search(int digit, int unused, uint128 pow, int sum_candidate_mod9, int sum_digits_mod9) {
     if (pow >= maxPow) return;
+
+    // Prune if even the maximum possible remaining sum can't reach minPow
+    if (digit > 0) {
+        uint128 max_remaining = (uint128)unused * pows[digit - 1][N];
+        if (pow + max_remaining < minPow) {
+            return;
+        }
+    }
+
     if (digit == -1) {
-        if (check(pow)) print_uint128(pow), printf("\n");
+        // Check congruence modulo 9
+        if (sum_candidate_mod9 != sum_digits_mod9) return;
+        if (check(pow)) {
+            print_uint128(pow);
+            printf("\n");
+        }
         return;
     }
+
     if (digit == 0) {
         digitsMultiSet[digit] = unused;
-        search(digit - 1, 0, pow);
+        search(digit - 1, 0, pow, sum_candidate_mod9, (sum_digits_mod9 + unused * 0) % 9);
     } else {
         uint128 bi = pow;
         for (int i = 0; i <= unused; i++) {
             digitsMultiSet[digit] = i;
-            search(digit - 1, unused - i, bi);
+            int new_sum_candidate = (sum_candidate_mod9 + i * mod9_pows[digit]) % 9;
+            int new_sum_digits = (sum_digits_mod9 + i * digit) % 9;
+            search(digit - 1, unused - i, bi, new_sum_candidate, new_sum_digits);
             if (i != unused) bi += pows[digit][N];
         }
     }
@@ -96,13 +113,17 @@ void generate(int maxN) {
     genPows(maxN);
     for (N = 1; N <= maxN; N++) {
         prepareLimits(N);
+        // Precompute mod9_pows for current N
+        for (int d = 0; d < 10; d++) {
+            mod9_pows[d] = (int)(pows[d][N] % 9);
+        }
         memset(digitsMultiSet, 0, sizeof(digitsMultiSet));
-        search(9, N, 0);
+        search(9, N, 0, 0, 0);
     }
 }
 
 int main() {
-    int maxDigits = 39;  // Generate Armstrong numbers up to 39 digits
+    int maxDigits = 27;
     clock_t start = clock();
     generate(maxDigits);
     clock_t finish = clock();
