@@ -67,7 +67,7 @@ int frequenciesEqual(int *a, int *b) {
 
 // Function to verify if the candidate is an Armstrong number
 int check(uint128 candidate) {
-    if (candidate >= maxPow || candidate < minPow) return 0;
+    // if (candidate >= maxPow || candidate < minPow) return 0; // redundant?
     getFrequency(candidate, testMultiSet);
     return frequenciesEqual(testMultiSet, digitsMultiSet);
 }
