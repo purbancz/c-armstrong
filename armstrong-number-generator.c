@@ -43,9 +43,14 @@ void genPows(int maxN) {
 
 // Function to compute minPow = 10^(N-1) and maxPow = 10^N
 void prepareLimits(int currentN) {
-    minPow = (currentN == 1) ? 0 : 1;
+    if (currentN == 1) {
+        minPow = 1;
+        maxPow = 10;
+    } else {
+        minPow = 1;
     for (int i = 0; i < currentN - 1; i++) minPow *= 10;
     maxPow = minPow * 10;
+    }
 }
 
 // Function to extract digit frequencies from a __int128 number
